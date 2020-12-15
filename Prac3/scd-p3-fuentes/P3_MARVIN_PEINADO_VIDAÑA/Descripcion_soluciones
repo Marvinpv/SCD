@@ -1,0 +1,51 @@
+PRODUCTORES Y CONSUMIDORES MULTIPLES:
+En esta solución, cambiamos los id por etiquetas, para que a la hora de recibir
+el buffer datos, sea posible que pueda recibir de cualquiera de los dos procesos,
+tanto el productor como el consumidor.
+
+Para adaptar la solución a varios productores y consumidores, el numero de valores
+a producir por productor y a consumir por consumidor se tienen que repartir 
+equivalentemente entre los procesos para que todos realicen el mismo número de interacciones.
+
+En cuanto a la función productora, su funcionamiento es el mismo que en la plantilla,
+solo que esta vez envía datos al buffer con su etiqueta de cara a diferenciarse del
+consumidor.
+
+El consumidor también realiza una función parecida al anterior, manda una petición al
+buffer con su etiqueta, y a continuación recibe el valor de este con su etiqueta.
+
+El proceso buffer ahora cambia bastante. Para reconocer de que proceso recibir, cambia
+la etiqueta aceptable en función del estado del buffer(recibe del productor si el buffer esta
+vacio, del consumidor si esta lleno, o de ambos si está a medio llenar).
+
+A continuación recibe la señal, y la  identifica con la variable estado. Si ha recibido del
+productor, mete el valor recibido en el buffer. Si ha recibido la señal del consumidor, entonces
+saca el valor que más tiempo lleva en el buffer y se lo envía de vuelta al consumidor, utilizando la 
+variable estado para conocer cuál fue el proceso consumidor que realizó la petición
+
+CENA DE LOS FILÓSOFOS CON Y SIN INTERBLOQUEO(Sin camarero):
+Puede ocurrir interbloqueo cuando todos los filósofos cogen el tenedor izquierdo 
+y se quedan esperando al derecho.
+
+La solución al interbloqueo consiste en hacer que un filósofo empiece cogiendo el tenedor derecho
+Así, se conseguirá que él(si consigue coger el de su derecha antes que el otro) se desbloquee si gana 
+los tenedores antes que los filósofos de sus lados, o que si él se bloquea esperando el tenedor de su derecha,
+el filósofo que está a su izquierda coga los dos tenedores (Todo esto en el caso de que ocurra la situación de 
+interbloqueo en la que todos los filósofos cogen el tenedor de su izquierda y esperan indefinidamente)
+
+CENA DE LOS FILÓSOFOS CON CAMARERO:
+Para realizar este problema, se implementa una nueva función , la del camarero,
+que solo la ejecutará un proceso. En esta función, el camarero hace lo siguiente:
+Sienta al máximo de filósofos posibles (todos menos uno), y a continuación levanta 
+a cada filósofo conforme estos lo van pidiendo.Siempre que se levanta a un filósofo, el
+camarero rellena su hueco con otro filósofo que quiera sentarse. Al ser el envío síncrono,
+el camarero debe esperar a que un filósofo solicite sentarse para ver si puede levantar al 
+siguiente
+
+La función que realiza los filósofos es la siguiente, Manda una señal sincrona para solicitar
+sentarse, a continuación coge los tenedores , come y los suelta, y después de esto, el filósofo
+solicita levantarse al camarero, para ponerse a pensar
+
+Para este problema, los procesos tenedor y camarero pueden recibir distintas señales(sentarse, levantarse,
+coger el tenedor y soltarlo), por lo que es necesario diferenciarlas con etiquetas para que cada MPI_Recv reciba
+las señales adecuadas y no se solapen, dando lugar a errores

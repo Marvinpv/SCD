@@ -1,0 +1,3 @@
+Actividad Exclusión mutua con monitores:
+
+Como es evidente, al quitar el unlock del cerrojo y no tener una guarda de cerrojo, el cerrojo nunca se desbloquea, bloqueando la ejecución del programa por tiempo indefinido

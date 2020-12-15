@@ -1,0 +1,5 @@
+Actividad Señalar y espera urgente:
+
+En la semántica Señalar y espera urgente ocurre que cuando se hace signal, salen del wait las hebras del grupo sin que se "cuele" ninguna otra de otro grupo dejando a alguna del grupo en el wait. Esto ocurre debido a que la manera de operar es distinta.
+
+En Señalar y continuar, la hebra señaladora ejecuta todos los signals repetidamente y a continuación pone cont a 0. Esto hace que por temas del SO o la ejecución que no nos interesan, puede que antes de que todas las hebras en espera, al estar el contador a 0, otra hebra de otro grupo entre en el wait y reciba el signal, dejando a una hebra del grupo original en el wait. En Señalar y espera urgente, el programa se ejecuta de manera distinta: Al hacer el signal, la hebra señaladora se queda en espera urgente, esperando a que una hebra señalada, que ha cogido el cerrojo termine su ejecución, a continuación la hebra señaladora vuelve a coger el cerrojo y hace de nuevo un signal, y así consecutivamente. De esta manera, el cerrojo oscila entre la hebra señaladora y las que estaban en el wait. Así consigue que salgan las hebras del grupo antes de que entren otras
