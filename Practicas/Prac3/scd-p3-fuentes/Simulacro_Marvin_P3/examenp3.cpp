@@ -88,7 +88,7 @@ void funcion_intermediario(){
 
         if(estado.MPI_TAG == etiq_pagar){
             MPI_Ssend(&cajas_ocupadas, 1 , MPI_INT , estado.MPI_SOURCE , etiq_inter , MPI_COMM_WORLD);
-            cout<<"Cliente "<<cliente<<" ha pagado en caja"<<endl;
+            cout<<"Cliente "<<cliente<<" ha entrado a pagar en caja"<<endl;
             cajas_ocupadas++;
             cout<<"Cajas ocupadas "<<cajas_ocupadas<<endl;
         }else if(estado.MPI_TAG == etiq_salir){
