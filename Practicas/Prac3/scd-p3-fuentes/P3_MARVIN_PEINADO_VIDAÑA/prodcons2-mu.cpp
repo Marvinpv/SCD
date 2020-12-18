@@ -33,7 +33,6 @@ const int
    num_prod              = 4 ,
    num_cons              = 5 ,
    id_buffer             = num_prod,
-   id_cons               = num_prod+1,
    vals_por_prod         = num_items/num_prod,
    vals_por_cons         = num_items/num_cons;  
 
