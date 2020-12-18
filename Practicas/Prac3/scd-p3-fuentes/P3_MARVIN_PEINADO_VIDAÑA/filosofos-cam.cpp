@@ -118,12 +118,11 @@ void funcion_tenedores( int id )
 
   while ( true )
   {
-     // ...... recibir petición de cualquier filósofo (completar)
-     // ...... guardar en 'id_filosofo' el id. del emisor (completar)
+    
      MPI_Recv ( &id_filosofo , 1 , MPI_INT , MPI_ANY_SOURCE , etiq_tenedor , MPI_COMM_WORLD , &estado );
      cout <<"Ten. " <<id <<" ha sido cogido por filo. " <<id_filosofo <<endl;
 
-     // ...... recibir liberación de filósofo 'id_filosofo' (completar)
+     
      MPI_Recv ( &valor , 1 , MPI_INT , id_filosofo , etiq_tenedor , MPI_COMM_WORLD , &estado );
      cout <<"Ten. "<< id<< " ha sido liberado por filo. " <<id_filosofo <<endl ;
   }

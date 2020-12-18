@@ -1,0 +1,22 @@
+var num_procesos_total : integer := n;
+    sc_ocupada         : boolean  := false;
+    procesos_actuales  : integer :=0;
+
+
+
+procedure protocolo_entrada[i:1...n]
+begin
+    while TestandSet(sc_ocupada)do
+        begin end
+    
+    procesos_actuales++;
+    if(procesos_actuales < num_procesos_total)then begin
+        sc_ocupada = false
+    end
+end
+
+procedure protocolo_salida[i:1...n]
+begin   
+    procesos_actuales--;
+    sc_ocupada = false;
+end
