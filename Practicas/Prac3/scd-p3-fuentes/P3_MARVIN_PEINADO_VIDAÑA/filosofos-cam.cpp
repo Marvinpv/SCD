@@ -25,8 +25,8 @@ using namespace std::chrono ;
 const int
    num_filosofos = 5 ,
    num_procesos  = 2*num_filosofos + 1,
-   id_camarero   = 10 ,
-   max_filosofos_en_mesa = 4 ,
+   id_camarero   = num_procesos - 1,
+   max_filosofos_en_mesa = num_filosofos - 1,
    etiq_tenedor    = 0,
    etiq_sentarse = 1,
    etiq_levantarse = 2;
@@ -67,13 +67,21 @@ template< int min, int max > int aleatorio()
 void funcion_filosofos( int id )
 {
   int id_ten_izq = (id+1)              % (num_procesos - 1), //id. tenedor izq.
-      id_ten_der = (id+num_procesos-2) % (num_procesos - 1); //id. tenedor der.
+      id_ten_der = (id+num_procesos-2) % (num_procesos - 1), //id. tenedor der.
+      confirmacion;
+
+  MPI_Status estado ;                                        // metadatos de las dos recepciones
+  
 
   while ( true )
   {
     //Se sienta el filósofo
     cout <<"Filósofo " << id << " solicita sentarse"<<endl;
     MPI_Ssend(&id , 1 , MPI_INT , id_camarero , etiq_sentarse , MPI_COMM_WORLD);
+
+    //El filósofo espera confirmación para sentarse
+    MPI_Recv(&confirmacion, 1 , MPI_INT , id_camarero , etiq_sentarse , MPI_COMM_WORLD , &estado);
+    cout <<"Filósofo "<< id <<" recibe confirmación y se sienta"<<endl;
     
     //Coge el tenedor izquierdo
     cout <<"Filósofo " <<id << " solicita ten. izq." <<id_ten_izq <<endl;
@@ -130,24 +138,31 @@ void funcion_tenedores( int id )
 // ---------------------------------------------------------------------
 
 void funcion_camarero(){
-    int id_sentado,
-        id_levantado,
-        filosofos_sentados = 0;
+    int id_peticion,
+        filosofos_sentados = 0,
+        etiqueta,
+        peticion = 1;
     MPI_Status estado ;
     
     while ( true )
     {
-        //Se sientan el máximo posible de filósofos a la mesa
-        while (filosofos_sentados < max_filosofos_en_mesa){
-            MPI_Recv( &id_sentado , 1 , MPI_INT , MPI_ANY_SOURCE , etiq_sentarse , MPI_COMM_WORLD , &estado );
-            cout << "Se ha sentado el filósofo "<<id_sentado<<" a la mesa"<<endl;
+
+        if(filosofos_sentados < max_filosofos_en_mesa)
+            etiqueta = MPI_ANY_TAG;
+        else
+            etiqueta = etiq_levantarse;
+        
+        MPI_Recv(&id_peticion, 1 , MPI_INT , MPI_ANY_SOURCE , etiqueta , MPI_COMM_WORLD , &estado);
+
+        if(estado.MPI_TAG == etiq_sentarse){
             filosofos_sentados++;
+            MPI_Ssend(&peticion, 1 , MPI_INT , estado.MPI_SOURCE , etiq_sentarse , MPI_COMM_WORLD);
+            cout << "Se ha sentado el filósofo "<<id_peticion<<" a la mesa"<<endl;
+        }else if(estado.MPI_TAG == etiq_levantarse){
+            filosofos_sentados--;
+            cout<<" Se ha levantado de la mesa el filósofo "<<id_peticion<<", hay "<<filosofos_sentados<<" filósofos en la mesa"<<endl;
         }
 
-        //Cuando se levanta uno, se vuelve a buscar sitio para que se siente otro
-        MPI_Recv( &id_levantado , 1 , MPI_INT , MPI_ANY_SOURCE , etiq_levantarse , MPI_COMM_WORLD , &estado );
-        cout<<"Se ha levantado el filósofo "<<id_levantado<<" de la mesa"<<endl;
-        filosofos_sentados--;
     }
     
 }
